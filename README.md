@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -72,3 +73,12 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 =======
 # mesto-react
 >>>>>>> cb1a7cc7954b165840818733980e71b8ba500c55
+=======
+# Здесь будет ваш проект на Реакте с авторизацией и регистрацией
+
+Используйте ваши предыдущие наработки по проекту Mesto. Это может быть работа 11-го спринта или его улучшенная версия после 2-х последних спринтов. 
+
+Все запросы на авторизацию, регистрацию и проверку токена должны работать через сервис `https://auth.nomoreparties.co`. Остальные запросы, не относящиеся к этой проектной работе могут быть к бэкенду из предыдущих спринтов.
+
+Успехов!
+>>>>>>> e50f115f5997cbf68a7d62e1d0fd1a33d4345cdf
