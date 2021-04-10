@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
+import { Route, Switch, Redirect, useHistory, Link } from 'react-router-dom';
 
 import Header from './Header.js';
 import Main from './Main.js';
@@ -10,18 +10,19 @@ import EditAvatarPopup from './EditAvatarPopup.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import ImagePopup from './ImagePopup.js';
 import api from '../utils/api.js';
+import { login } from '../utils/auth.js'
+import { register } from '../utils/auth.js'
 
 import Login from './Login.js';
 import Register from './Register.js';
 import InfoToolTip from './InfoToolTip.js';
 import SignOut from './SignOut.js';
 import ProtectedRoute from './ProtectedRoute.js';
-import{ authTokenCheck } from '../utils/auth.js'
+import { authTokenCheck } from '../utils/auth.js'
 
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
 
 function App() {
-  console.log(localStorage.getItem('JWT'))
   let history = useHistory();
   const [loggedIn, setLoggedIn] = useState(false)
 
@@ -68,26 +69,66 @@ function App() {
       .catch(err => console.log(`Что-то пошло не так: ${err}`));
   }
 
-  function handlePopupError(errorState) {
-    if(errorState) {
-      setPopupError(true)
-    } else {
-      setPopupError(false)
+  function tokenCheck() {
+    if (localStorage.getItem('JWT')) {
+      const token = localStorage.getItem('JWT');
+      authTokenCheck(token)
+        .then((res) => {
+          if (res) {
+            setUserEmail(res.data.email)
+            setLoggedIn(true);
+            history.push('/content')
+          }
+        })
+        .catch(err => console.log(`Что-то пошло не так: ${err}`))
     }
   }
 
-  function tokenCheck() {
-    if (localStorage.getItem('JWT')){
-      const token = localStorage.getItem('JWT');
-      authTokenCheck(token)
+  function handleLogOutClick() {
+    localStorage.removeItem('JWT');
+  }
+
+  function handleHeaderButtonClick() {
+    if (!isLogOutPopupOpen) {
+      setIsLogOutPopupOpen(true)
+    } else {
+      setIsLogOutPopupOpen(false)
+    }
+  }
+
+  function handleLogin(email, password) {
+    login(email, password)
       .then((res) => {
-        if(res) {
-          setUserEmail(res.data.email)
-          setLoggedIn(true);
+        if (res) {
+          setUserEmail(email)
+          localStorage.setItem('JWT', res.token)
+          setLoggedIn(true)
           history.push('/content')
         }
       })
-    }
+  }
+
+  function handleRegister(email, password) {
+    register(email, password)
+      .then((res) => {
+        if (res) {
+          console.log(res)
+          setPopupError(false)
+          setLoggedIn(true)
+          setIsLogOutPopupOpen(true)
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        if (err) {
+          console.log(err)
+          setPopupError(true)
+          setIsLogOutPopupOpen(true)
+        }
+        else {
+          setPopupError(false)
+        }
+      })
   }
 
   useEffect(() => {
@@ -155,8 +196,14 @@ function App() {
       <CurrentUserContext.Provider value={currentUser}>
         <Switch>
           <Route path="/content">
-            <SignOut userEmail={userEmail} isLogOutPopupOpen={isLogOutPopupOpen} />
-            <Header userEmail={userEmail} setIsLogOutPopupOpen={setIsLogOutPopupOpen} isLogOutPopupOpen={isLogOutPopupOpen}/>
+            <SignOut userEmail={userEmail} isLogOutPopupOpen={isLogOutPopupOpen} handleLogOutClick={handleLogOutClick} />
+            <Header>
+              <div className="header__container">
+                <p className="header__email">{userEmail}</p>
+                <Link onClick={handleLogOutClick} className="header__signout" to="/sign-in">Выйти</Link>
+              </div>
+              <button onClick={handleHeaderButtonClick} className={`header__button ${!isLogOutPopupOpen ? '' : 'header__button_active'}`} type="button"></button>
+            </Header>
             <ProtectedRoute exact path="/"
               component={Main}
               onEditProfile={handleEditProfileClick}
@@ -179,13 +226,13 @@ function App() {
             <ImagePopup card={selectedCard} onClose={closeAllPopups} />
           </Route>
           <Route path="/sign-in">
-            <Login setLoggedIn={setLoggedIn} />
+            <Login handleLogin={handleLogin} />
           </Route>
           <Route path="/sign-up">
-            <Register setLoggedIn={setLoggedIn} setIsLogOutPopupOpen={setIsLogOutPopupOpen} handlePopupError={handlePopupError}/>
-            <InfoToolTip isLogOutPopupOpen={isLogOutPopupOpen} closeAllPopups={closeAllPopups} popupError={popupError}/>
+            <Register handleRegister={handleRegister}/>
+            <InfoToolTip isLogOutPopupOpen={isLogOutPopupOpen} closeAllPopups={closeAllPopups} popupError={popupError} textSuccess={'Вы успешно зарегистрировались'} textFail={'Что-то пошло не так! Попробуйте еще раз.'} />
           </Route>
-          <Route exact path="/">
+          <Route>
             {loggedIn ? <Redirect to="/content" /> : <Redirect to="/sign-in" />}
           </Route>
         </Switch>

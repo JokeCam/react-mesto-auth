@@ -1,5 +1,5 @@
 import './InfoToolTip.css'
-import logoSucces from '../images/Union.svg'
+import logoSuccess from '../images/Union.svg'
 import logoFail from '../images/Union-fail.svg'
 import { useHistory } from 'react-router-dom'
 
@@ -12,17 +12,21 @@ function InfoToolTip(props) {
     let history = useHistory();
 
     function handleCloseClick() {
+        let pushLoc = ''
+        if (props.popupError){
+            pushLoc = '/sign-up'
+        } else {
+            pushLoc = '/sign-in'
+        }
         props.closeAllPopups();
-        history.push('/sign-in')
+        history.push(pushLoc)
     }
-
-    console.log(props.popupError)
 
     return (
         <div className={`info ${opened}`}>
             <div className="info__container">
-                <img className="info__logo" src={props.popupError ? logoFail : logoSucces} alt="Иконка 'успешная регистрация' или 'неудачная регистрация'"></img>
-                <p className="info__text">{props.popupError ? 'Что-то пошло не так! Попробуйте еще раз.' : 'Вы успешно зарегистрировались'}</p>
+                <img className="info__logo" src={props.popupError ? logoFail : logoSuccess} alt="Иконка 'успешная регистрация' или 'неудачная регистрация'"></img>
+                <p className="info__text">{props.popupError ? props.textFail : props.textSuccess}</p>
                 <button className="info__close" type="button" onClick={handleCloseClick}></button>
             </div>
         </div>

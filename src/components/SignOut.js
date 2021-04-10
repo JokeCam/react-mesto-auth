@@ -10,7 +10,7 @@ function SignOut(props) {
     return (
         <div className={`signout ${shown}`}>
             <p className="signout__email">{props.userEmail}</p>
-            <Link className="signout__button" to="/sign-in">Выйти</Link>
+            <Link onClick={props.handleLogOutClick} className="signout__button" to="/sign-in">Выйти</Link>
         </div>
     )
 }

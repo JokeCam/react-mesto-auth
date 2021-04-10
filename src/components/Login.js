@@ -1,14 +1,12 @@
 import './Login.css'
-import logo from '../images/logo.svg';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { login } from '../utils/auth.js'
+import Header from './Header.js'
 
 function Login(props) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    let history = useHistory();
 
     function handleEmailChange(e){
         setEmail(e.target.value);
@@ -20,25 +18,15 @@ function Login(props) {
 
     function handleSubmit(e){
         e.preventDefault();
-
-        login(email, password)
-        .then((res)=> {
-            if(res){
-                console.log(res)
-                localStorage.setItem('JWT', res.token)
-                props.setLoggedIn(true)
-                history.push('/content')
-            }
-        })
+        props.handleLogin(email, password)
     }
 
 
     return (
         <>
-            <header className="header">
-                <img className="header__logo" src={logo} alt="Лого сайта: Место" />
+            <Header>
                 <Link className="header__link" to="/sign-up">Регистрация</Link>
-            </header>
+            </Header>
             <form onSubmit={handleSubmit} className="login login__form">
                 <h1 className="login__title">Вход</h1>
                 <input value={email} onChange={handleEmailChange} className="login__input" type="email" placeholder="Email" required></input>
