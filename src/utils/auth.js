@@ -17,6 +17,7 @@ export const register = (email, password) => {
           return Promise.reject(`Что-то пошло не так: ${res.status}`);
         }
       )
+      .catch(err => console.log(`Что-то пошло не так: ${err}`))
 }
 
 export const login = (email, password) => {

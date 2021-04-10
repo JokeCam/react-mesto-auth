@@ -1,6 +1,6 @@
 import './Register.css'
 import logo from '../images/logo.svg';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { register } from '../utils/auth.js'
 
@@ -10,27 +10,37 @@ function Register(props) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    let history = useHistory();
+    const [popupError, setPopupError] = useState(false);
 
-    function handleEmailChange(e){
+    function handleEmailChange(e) {
         setEmail(e.target.value);
     }
 
-    function handlePasswordChange(e){
+    function handlePasswordChange(e) {
         setPassword(e.target.value);
     }
 
-    function handleSubmit(e){
+    function handleSubmit(e) {
         e.preventDefault()
         register(email, password)
-        .then((res)=> {
-            if(res){
-                console.log(res)
-                props.setLoggedIn(true)
-                props.setIsLogOutPopupOpen(true)
-                history.push('/sign-in')
-            } 
-        })
+            .then((res) => {
+                if (res) {
+                    console.log(res)
+                    props.setLoggedIn(true)
+                    props.setIsLogOutPopupOpen(true)
+                }
+            })
+            .catch((err) => {
+                if (err) {
+                    console.log(err)
+                    setPopupError(true)
+                    props.handlePopupError(popupError)
+                }
+                else {
+                    setPopupError(false)
+                    props.handlePopupError(popupError)
+                }
+            })
     }
 
     return (

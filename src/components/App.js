@@ -37,6 +37,8 @@ function App() {
 
   const [userEmail, setUserEmail] = useState('')
 
+  const [popupError, setPopupError] = useState(false)
+
   function handleCardLike(card) {
     const isLiked = card.likes.some(i => i._id === currentUser._id);
 
@@ -64,6 +66,14 @@ function App() {
         closeAllPopups()
       })
       .catch(err => console.log(`Что-то пошло не так: ${err}`));
+  }
+
+  function handlePopupError(errorState) {
+    if(errorState) {
+      setPopupError(true)
+    } else {
+      setPopupError(false)
+    }
   }
 
   function tokenCheck() {
@@ -172,8 +182,8 @@ function App() {
             <Login setLoggedIn={setLoggedIn} />
           </Route>
           <Route path="/sign-up">
-            <Register setLoggedIn={setLoggedIn} setIsLogOutPopupOpen={setIsLogOutPopupOpen}/>
-            <InfoToolTip isLogOutPopupOpen={isLogOutPopupOpen} closeAllPopups={closeAllPopups}/>
+            <Register setLoggedIn={setLoggedIn} setIsLogOutPopupOpen={setIsLogOutPopupOpen} handlePopupError={handlePopupError}/>
+            <InfoToolTip isLogOutPopupOpen={isLogOutPopupOpen} closeAllPopups={closeAllPopups} popupError={popupError}/>
           </Route>
           <Route exact path="/">
             {loggedIn ? <Redirect to="/content" /> : <Redirect to="/sign-in" />}
