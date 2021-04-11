@@ -8,4 +8,4 @@
 - CSS(Grid)
 - HTML
 
-GH Pages: https://jokecam.github.io/mesto/
+GH Pages: https://jokecam.github.io/react-mesto-auth
