@@ -9,17 +9,14 @@ function Main(props) {
 
   const onAddPlace = () => {
     props.onAddPlace()
-    console.log('clicked onAddPlace')
   }
 
   const onEditProfile = () => {
     props.onEditProfile()
-    console.log('clicked onEditProfile')
   }
 
   const onEditAvatar = () => {
     props.onEditAvatar()
-    console.log('clicked onEditAvatar')
   }
   
   return (

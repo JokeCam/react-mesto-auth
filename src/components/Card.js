@@ -5,9 +5,9 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 function Card(item) {
     const currentUser = useContext(CurrentUserContext);
 
-    const isOwn = item.item.owner._id === currentUser._id;
+    const isOwn = item.item.owner === currentUser._id;
 
-    const isLiked = item.item.likes.some(i => i._id === currentUser._id);
+    const isLiked = item.item.likes.some(i => i === currentUser._id);
 
     function handleDeleteClick(){
         item.onCardDelete(item.item)

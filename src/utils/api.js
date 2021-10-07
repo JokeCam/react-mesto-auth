@@ -8,7 +8,8 @@ class Api {
     getUserInfo(){
         return fetch(`${this._url}/users/me`, {
             method: "GET",
-            headers: this._headers
+            credentials: 'include',
+            headers: this._headers,
         })
         .then(this._checkResponse)
     }
@@ -16,7 +17,8 @@ class Api {
     getCards(){
         return fetch(`${this._url}/cards`, {
             method: "GET",
-            headers: this._headers
+            credentials: 'include',
+            headers: this._headers,
         })
         .then(this._checkResponse)
     }
@@ -24,6 +26,7 @@ class Api {
     updateUserInfo(data){
         return fetch(`${this._url}/users/me`, {
             method: "PATCH",
+            credentials: 'include',
             headers: this._headers,
             body: JSON.stringify({
                 name: data.name,
@@ -36,6 +39,7 @@ class Api {
     addNewCard(data){
         return fetch(`${this._url}/cards`, {
             method: "POST",
+            credentials: 'include',
             headers: this._headers,
             body: JSON.stringify({
                 name: data.name,
@@ -48,23 +52,26 @@ class Api {
     deleteCard(id){
         return fetch(`${this._url}/cards/${id}`, {
             method: "DELETE",
-            headers: this._headers
+            credentials: 'include',
+            headers: this._headers,
         })
         .then(this._checkResponse)
     }
 
     addLike(id){
-        return fetch(`${this._url}/cards/likes/${id}`, {
+        return fetch(`${this._url}/cards/${id}/likes`, {
             method: "PUT",
-            headers: this._headers
+            credentials: 'include',
+            headers: this._headers,
         })  
         .then(this._checkResponse)
     }
 
     removeLike(id){
-        return fetch(`${this._url}/cards/likes/${id}`, {
+        return fetch(`${this._url}/cards/${id}/likes`, {
             method: "DELETE",
-            headers: this._headers
+            credentials: 'include',
+            headers: this._headers,
         })  
         .then(this._checkResponse)
     }
@@ -72,6 +79,7 @@ class Api {
     updateUserAvatar(url){
         return fetch(`${this._url}/users/me/avatar`, {
             method: "PATCH",
+            credentials: 'include',
             headers: this._headers,
             body: JSON.stringify({
                 avatar: url,
@@ -89,9 +97,8 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-20',
+  baseUrl: 'https://api.mesto.stanislav.nomoredomains.club',
   headers: {
-    authorization: '75314450-8bde-49f1-8e95-7ac1e831360d',
     'Content-Type': 'application/json'
   }
 });

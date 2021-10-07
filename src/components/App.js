@@ -11,6 +11,7 @@ import AddPlacePopup from './AddPlacePopup.js';
 import ImagePopup from './ImagePopup.js';
 import api from '../utils/api.js';
 import { login } from '../utils/auth.js'
+import { logout } from '../utils/auth.js'
 import { register } from '../utils/auth.js'
 
 import Login from './Login.js';
@@ -18,7 +19,6 @@ import Register from './Register.js';
 import InfoToolTip from './InfoToolTip.js';
 import SignOut from './SignOut.js';
 import ProtectedRoute from './ProtectedRoute.js';
-import { authTokenCheck } from '../utils/auth.js'
 
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
 
@@ -41,20 +41,25 @@ function App() {
   const [popupError, setPopupError] = useState(false)
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some(i => i === currentUser._id);
 
     if (!isLiked) {
-      api.addLike(card._id).then((newCard) => {
+      api.addLike(card._id)
+      .then((newCard) => {
         setCards((state) => state.map((c) => c._id === card._id ? newCard : c))
-      }).catch(err => console.log(`Что-то пошло не так: ${err}`));
+      })
+      .catch(err => console.log(`Что-то пошло не так: ${err}`));
     } else {
-      api.removeLike(card._id).then((newCard) => {
+      api.removeLike(card._id)
+      .then((newCard) => {
         setCards((state) => state.map((c) => c._id === card._id ? newCard : c))
-      }).catch(err => console.log(`Что-то пошло не так: ${err}`));
+      })
+      .catch(err => console.log(`Что-то пошло не так: ${err}`));
     }
   }
 
   function handleCardDelete(card) {
+    console.log(card)
     api.deleteCard(card._id)
       .then(setCards(cards.filter(item => item._id !== card._id)))
       .catch(err => console.log(`Что-то пошло не так: ${err}`));
@@ -69,23 +74,32 @@ function App() {
       .catch(err => console.log(`Что-то пошло не так: ${err}`));
   }
 
-  function tokenCheck() {
-    if (localStorage.getItem('JWT')) {
-      const token = localStorage.getItem('JWT');
-      authTokenCheck(token)
-        .then((res) => {
-          if (res) {
-            setUserEmail(res.data.email)
-            setLoggedIn(true);
-            history.push('/content')
-          }
-        })
-        .catch(err => console.log(`Что-то пошло не так: ${err}`))
-    }
+  function updateUserInfo() {
+    api.getUserInfo()
+    .then((res) => {
+      if (res) {
+        setCurrentUser(res)
+        setUserEmail(res.email)
+        setLoggedIn(true)
+        history.push('/content')
+      }
+    })
+    .catch(err => console.log(`Что-то пошло не так: ${err}`))
+  }
+
+  function updateCards() {
+    api.getCards()
+    .then(res => setCards(res))
+    .catch(err => console.log(`Что-то пошло не так: ${err}`))
+  }
+
+  function cookieCheck() {
+    updateUserInfo();
+    updateCards();
   }
 
   function handleLogOutClick() {
-    localStorage.removeItem('JWT');
+    logout();
   }
 
   function handleHeaderButtonClick() {
@@ -101,7 +115,8 @@ function App() {
       .then((res) => {
         if (res) {
           setUserEmail(email)
-          localStorage.setItem('JWT', res.token)
+          setCurrentUser(res)
+          console.log(res)
           setLoggedIn(true)
           history.push('/content')
         }
@@ -131,27 +146,28 @@ function App() {
       })
   }
 
-  useEffect(() => {
-    api.getCards()
-      .then(res => setCards(res))
-      .catch(err => console.log(`Что-то пошло не так: ${err}`))
-  }, [])
+  // useEffect(() => {
+  //   api.getCards()
+  //     .then(res => setCards(res))
+  //     .catch(err => console.log(`Что-то пошло не так: ${err}`))
+  // }, [])
+
+  // useEffect(() => {
+  //   api.getUserInfo()
+  //     .then((res) => {
+  //       setCurrentUser(res);
+  //     })
+  //     .catch(err => console.log(`Что-то пошло не так: ${err}`))
+  // }, [])
 
   useEffect(() => {
-    api.getUserInfo()
-      .then((res) => {
-        setCurrentUser(res);
-      })
-      .catch(err => console.log(`Что-то пошло не так: ${err}`))
-  }, [])
-
-  useEffect(() => {
-    tokenCheck()
+    cookieCheck()
   }, [])
 
   const handleUpdateUser = (data) => {
     api.updateUserInfo(data)
       .then(res => {
+        console.log(res)
         setCurrentUser(res);
         closeAllPopups();
       })
@@ -229,7 +245,7 @@ function App() {
             <Login handleLogin={handleLogin} />
           </Route>
           <Route path="/sign-up">
-            <Register handleRegister={handleRegister}/>
+            <Register handleRegister={handleRegister} />
             <InfoToolTip isLogOutPopupOpen={isLogOutPopupOpen} closeAllPopups={closeAllPopups} popupError={popupError} textSuccess={'Вы успешно зарегистрировались'} textFail={'Что-то пошло не так! Попробуйте еще раз.'} />
           </Route>
           <Route>
